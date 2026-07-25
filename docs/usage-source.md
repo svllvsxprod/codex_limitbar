@@ -18,12 +18,13 @@ Authoritative references:
 
 ## Authentication order
 
-1. Standard Codex auth at `~/.codex/auth.json`.
-2. Local OpenCode OpenAI OAuth at `~/.local/share/opencode/auth.json`.
+1. App-owned ChatGPT OAuth stored in macOS Keychain.
+2. Standard Codex auth at `~/.codex/auth.json`.
+3. Local OpenCode OpenAI OAuth at `~/.local/share/opencode/auth.json`.
 
-The OpenCode fallback is unsupported by OpenAI and may break when OpenCode changes its local auth format. It is used because this machine currently has an authenticated OpenCode session but no installed Codex CLI. The app only reads these files, keeps tokens in memory, and sends them only to `chatgpt.com`; it never modifies, stores, or logs them.
+The app-owned session is created with the ChatGPT device authorization flow. The one-time code is copied to the pasteboard and the OpenAI device page opens in the default browser. Access and refresh tokens are stored as a generic password in Keychain with after-first-unlock, this-device-only accessibility.
 
-If a token expires, sign in again through the application that owns it. The app deliberately does not refresh or take ownership of another application's OAuth credentials.
+The app refreshes only its own Keychain credential. The OpenCode fallback is unsupported by OpenAI and may break when OpenCode changes its local auth format. Codex Limit Bar only reads external auth files and never modifies or refreshes another application's credentials.
 
 ## Failure behavior
 
@@ -35,6 +36,8 @@ If a token expires, sign in again through the application that owns it. The app 
 - Unknown or empty usage payload: malformed response.
 
 The last successful snapshot remains visible as stale data after a failed refresh.
+
+After macOS wakes from sleep, the app schedules refreshes after 3 and 15 seconds so network and VPN routes have time to recover. A `401` response is retried once: app-owned credentials are refreshed through OpenAI OAuth, while an external fallback is only re-read from its owning client's file.
 
 The app refreshes immediately when its menu panel opens and then every 15 seconds only while the panel remains visible. Closing the panel cancels periodic polling, avoiding continuous background requests.
 

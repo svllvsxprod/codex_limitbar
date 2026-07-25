@@ -34,7 +34,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.1.0" src="https://img.shields.io/badge/release-0.1.0-18A66A?style=for-the-badge">
+  <img alt="Release 0.1.1" src="https://img.shields.io/badge/release-0.1.1-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -68,17 +68,19 @@ Codex Limit Bar живёт только в строке меню и показы
 - Ручное обновление без параллельных дублирующихся запросов.
 - Автоматическое обновление каждые 15 секунд только при открытой панели.
 - Автозапуск через системный `SMAppService`.
+- Автономный ChatGPT device login с хранением собственной сессии в macOS Keychain.
 - Отдельная иконка limit-ring с OpenAI blossom, не совпадающая с официальным Codex client.
 - Нативная реализация на SwiftUI и AppKit без сторонних runtime-зависимостей.
 
 ## Установка
 
-1. Скачайте `Codex-Limit-Bar-0.1.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Скачайте `Codex-Limit-Bar-0.1.1.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Откройте DMG и перенесите `Codex Limit Bar.app` в `Applications`.
 3. Запустите приложение. Для ad-hoc сборки macOS может потребовать первый запуск через контекстное меню **Открыть**.
-4. При необходимости разрешите автозапуск в **Настройки системы → Основные → Объекты входа**.
+4. В панели приложения нажмите **Автономный вход**, вставьте скопированный код на открывшейся странице ChatGPT и завершите авторизацию.
+5. При необходимости разрешите автозапуск в **Настройки системы → Основные → Объекты входа**.
 
-Для работы нужна локальная авторизация OpenAI в Codex CLI или OpenCode.
+До автономного входа приложение может временно использовать локальную авторизацию Codex CLI или OpenCode как read-only fallback. После входа Codex Limit Bar хранит и обновляет собственную сессию независимо от запущенного OpenCode.
 
 ## Проверка VPN
 
@@ -96,13 +98,14 @@ Codex Limit Bar живёт только в строке меню и показы
 MenuBarExtra window
   -> UsageStore
   -> PublicServiceConnectivityGate
-  -> LocalChatGPTAuthLoader
+  -> ChatGPTAuthManager / Keychain
+  -> LocalChatGPTAuthLoader fallback
   -> LiveCodexUsageProvider
   -> chatgpt.com/backend-api/wham/usage
 ```
 
 - UI зависит от `CodexUsageProviding`, а не от transport response.
-- Парсер, локальная авторизация, VPN-gate и refresh state тестируются отдельно.
+- Парсер, OAuth retry, локальная авторизация, wake refresh, VPN-gate и refresh state тестируются отдельно.
 - Refresh-запросы coalesce и не создают параллельный polling loop.
 - Release pipeline собирает `.app`, `.icns`, DMG и SHA-256 checksum.
 
@@ -110,10 +113,11 @@ MenuBarExtra window
 
 - Токены никогда не записываются в код, fixtures, logs или release artifacts.
 - Auth-файлы принимаются только с приватными POSIX-правами без доступа group/other.
+- Собственная OAuth-сессия Codex Limit Bar хранится как generic password в macOS Keychain.
 - Токен хранится только в памяти и отправляется исключительно на точный HTTPS origin `chatgpt.com`.
 - VPN-проверки не получают токен, account ID или другие OpenAI credentials.
 - Используются ephemeral `URLSession`, отключённый URL cache и bounded timeouts.
-- Приложение только читает auth-файлы Codex/OpenCode и никогда их не изменяет.
+- Приложение только читает auth-файлы Codex/OpenCode и никогда их не изменяет; обновляется только собственная Keychain-сессия.
 
 Подробности источника данных: [`docs/usage-source.md`](docs/usage-source.md).
 
@@ -149,7 +153,7 @@ open dist/CodexLimitBar.app
 
 - `wham/usage` используется официальным open-source Codex client, но не документирован как стабильный публичный API.
 - Fallback на локальный OpenCode OAuth является неподдерживаемой интеграцией и может измениться вместе с форматом OpenCode auth.
-- Приложение не обновляет и не принимает во владение OAuth credentials другого клиента.
+- Приложение не обновляет и не принимает во владение OAuth credentials другого клиента; автономный device login создаёт отдельную app-owned сессию.
 - Текущий публичный DMG собран для Apple Silicon.
 - Сборка подписана ad-hoc и не нотарифицирована Apple; для публичной production-дистрибуции потребуется Developer ID и notarization.
 - macOS может потребовать ручное подтверждение login item.

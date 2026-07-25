@@ -21,6 +21,7 @@ struct UsageLimit: Equatable, Sendable, Identifiable {
 }
 
 enum UsageSource: String, Equatable, Sendable {
+    case codexLimitBar = "Codex Limit Bar"
     case codexCLI = "Codex CLI"
     case openCode = "OpenCode"
 }
@@ -48,9 +49,9 @@ enum UsageFailure: Error, Equatable, Sendable {
     var message: String {
         switch self {
         case .sourceUnavailable:
-            "Не найден вход Codex или OpenCode"
+            "Не найдена сессия ChatGPT"
         case .authentication:
-            "Сессия OpenAI истекла. Войдите заново в Codex или OpenCode."
+            "Сессия ChatGPT истекла. Выполните автономный вход."
         case .forbidden:
             "У аккаунта нет доступа к данным лимитов Codex"
         case .rateLimited:

@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import XCTest
 @testable import CodexLimitBar
@@ -67,6 +68,25 @@ final class UsageStoreTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(60))
         let countAfterStop = await provider.fetchCount
         XCTAssertEqual(countAfterStop, countAtStop)
+    }
+
+    @MainActor
+    func testRefreshesAfterWorkspaceWake() async throws {
+        let provider = CountingProvider()
+        let store = UsageStore(
+            provider: provider,
+            wakeRefreshDelays: [.milliseconds(10), .milliseconds(10)]
+        )
+
+        NSWorkspace.shared.notificationCenter.post(
+            name: NSWorkspace.didWakeNotification,
+            object: NSWorkspace.shared
+        )
+        try await Task.sleep(for: .milliseconds(180))
+
+        let fetchCount = await provider.fetchCount
+        XCTAssertEqual(fetchCount, 2)
+        withExtendedLifetime(store) {}
     }
 }
 

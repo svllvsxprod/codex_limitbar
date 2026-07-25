@@ -1,16 +1,16 @@
 import Foundation
 
 struct LiveCodexUsageProvider: CodexUsageProviding {
-    private let authLoader: LocalChatGPTAuthLoader
+    private let authSession: any ChatGPTAuthSessionProviding
     private let requestGate: any OpenAIRequestGating
     private let session: URLSession
 
     init(
-        authLoader: LocalChatGPTAuthLoader = LocalChatGPTAuthLoader(),
+        authSession: any ChatGPTAuthSessionProviding = ChatGPTAuthManager(),
         requestGate: any OpenAIRequestGating = PublicServiceConnectivityGate(),
         session: URLSession = LiveCodexUsageProvider.makeSession()
     ) {
-        self.authLoader = authLoader
+        self.authSession = authSession
         self.requestGate = requestGate
         self.session = session
     }
@@ -20,7 +20,14 @@ struct LiveCodexUsageProvider: CodexUsageProviding {
             throw UsageFailure.vpnUnavailable
         }
 
-        let auth = try authLoader.load()
+        return try await AuthenticationRetry.once(
+            operation: { try await fetchWithCurrentAuth(forceRefresh: false) },
+            retryOperation: { try await fetchWithCurrentAuth(forceRefresh: true) }
+        )
+    }
+
+    private func fetchWithCurrentAuth(forceRefresh: Bool) async throws -> UsageSnapshot {
+        let auth = try await authSession.validAuth(forceRefresh: forceRefresh)
         var request = URLRequest(
             url: URL(string: "https://chatgpt.com/backend-api/wham/usage")!
         )
@@ -69,6 +76,21 @@ struct LiveCodexUsageProvider: CodexUsageProviding {
         configuration.urlCache = nil
         configuration.httpCookieStorage = nil
         return URLSession(configuration: configuration)
+    }
+}
+
+enum AuthenticationRetry {
+    static func once<Value: Sendable>(
+        delay: Duration = .seconds(1),
+        operation: @escaping @Sendable () async throws -> Value,
+        retryOperation: @escaping @Sendable () async throws -> Value
+    ) async throws -> Value {
+        do {
+            return try await operation()
+        } catch let failure as UsageFailure where failure == .authentication {
+            try await Task.sleep(for: delay)
+            return try await retryOperation()
+        }
     }
 }
 

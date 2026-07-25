@@ -26,6 +26,10 @@ struct UsageMenuView: View {
                 }
             }
 
+            if store.state.snapshot != nil, store.signInState != .idle {
+                signInControls
+            }
+
             Divider()
             controls
         }
@@ -90,7 +94,13 @@ struct UsageMenuView: View {
                 }
                 Text(snapshot.fetchedAt, style: .relative)
                 Spacer()
-                Text(snapshot.source.rawValue)
+                if snapshot.source == .codexLimitBar {
+                    Text(snapshot.source.rawValue)
+                } else {
+                    Button("Автономный вход") { store.signIn() }
+                        .buttonStyle(.plain)
+                        .disabled(store.signInState != .idle)
+                }
             }
             .font(.caption2)
             .foregroundStyle(.secondary)
@@ -119,10 +129,50 @@ struct UsageMenuView: View {
     }
 
     private func errorMessage(_ failure: UsageFailure) -> some View {
-        Label(failure.message, systemImage: "exclamationmark.circle")
+        VStack(alignment: .leading, spacing: 8) {
+            Label(failure.message, systemImage: "exclamationmark.circle")
+                .font(.caption)
+                .foregroundStyle(.red)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if failure == .authentication || failure == .sourceUnavailable {
+                signInControls
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var signInControls: some View {
+        switch store.signInState {
+        case .idle:
+            Button("Войти в ChatGPT") { store.signIn() }
+                .controlSize(.small)
+        case .starting:
+            HStack(spacing: 7) {
+                ProgressView().controlSize(.small)
+                Text("Создаю код входа...")
+            }
             .font(.caption)
-            .foregroundStyle(.red)
-            .fixedSize(horizontal: false, vertical: true)
+        case let .waitingForUser(code):
+            VStack(alignment: .leading, spacing: 5) {
+                Text("Код: \(code)")
+                    .font(.system(.body, design: .monospaced).weight(.semibold))
+                    .textSelection(.enabled)
+                Text("Код скопирован. Завершите вход в открывшемся браузере.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                Button("Отменить") { store.cancelSignIn() }
+                    .controlSize(.small)
+            }
+        case let .failed(failure):
+            VStack(alignment: .leading, spacing: 5) {
+                Text(failure.message)
+                    .font(.caption2)
+                    .foregroundStyle(.red)
+                Button("Повторить вход") { store.signIn() }
+                    .controlSize(.small)
+            }
+        }
     }
 
     private var controls: some View {
