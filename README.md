@@ -16,11 +16,16 @@
   <tr>
     <td align="center" width="760">
       <h3>Поддержите разработку</h3>
-      <p>
-        <a href="https://t.me/tribute/app?startapp=dK9j"><img src="https://img.shields.io/badge/Tribute-Поддержать-24A1DE?style=for-the-badge&amp;logo=telegram&amp;logoColor=white" alt="Поддержать через Tribute" /></a>
-        <a href="https://nowpayments.io/donation/svllvsx"><img src="https://img.shields.io/badge/NOWPayments-Поддержать-121212?style=for-the-badge" alt="Поддержать через NOWPayments" /></a>
-        <a href="https://t.me/svllvsxprod"><img src="https://img.shields.io/badge/Telegram-svllvsxprod-26A5E4?style=for-the-badge&amp;logo=telegram&amp;logoColor=white" alt="Telegram-канал svllvsxprod" /></a>
-      </p>
+      <p>Поддержка помогает развивать приложение, проверять новые версии Codex и готовить подписанные сборки.</p>
+      <table align="center">
+        <tr>
+          <td align="center" width="350"><a href="https://t.me/tribute/app?startapp=dK9j"><img src="docs/readme/support-tribute.svg" width="340" alt="Поддержать разработку через Tribute" /></a></td>
+          <td align="center" width="350"><a href="https://nowpayments.io/donation/svllvsx"><img src="docs/readme/support-nowpayments.svg" width="340" alt="Поддержать разработку через NOWPayments" /></a></td>
+        </tr>
+        <tr>
+          <td align="center" colspan="2"><a href="https://t.me/svllvsxprod"><img src="docs/readme/telegram.svg" width="340" alt="Telegram-канал svllvsxprod" /></a></td>
+        </tr>
+      </table>
     </td>
   </tr>
 </table>
