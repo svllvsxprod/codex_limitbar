@@ -1,0 +1,8 @@
+.DS_Store
+.opencode/
+.build/
+dist/
+release/*.dmg
+release/*.sha256
+DerivedData/
+*.xcresult
