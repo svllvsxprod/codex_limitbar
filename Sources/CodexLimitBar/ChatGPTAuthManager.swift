@@ -33,8 +33,16 @@ struct StoredOAuthCredential: Codable, Equatable, Sendable {
 }
 
 struct KeychainOAuthCredentialStore: Sendable {
-    private let service = "local.svllvsx.codex-limitbar.oauth"
-    private let account = "openai"
+    private let service: String
+    private let account: String
+
+    init(
+        service: String = "local.svllvsx.codex-limitbar.oauth",
+        account: String = "openai"
+    ) {
+        self.service = service
+        self.account = account
+    }
 
     func load() throws -> StoredOAuthCredential? {
         var result: CFTypeRef?
@@ -43,7 +51,6 @@ struct KeychainOAuthCredentialStore: Sendable {
                 kSecClass: kSecClassGenericPassword,
                 kSecAttrService: service,
                 kSecAttrAccount: account,
-                kSecUseDataProtectionKeychain: true,
                 kSecReturnData: true,
                 kSecMatchLimit: kSecMatchLimitOne
             ] as CFDictionary,
@@ -73,8 +80,7 @@ struct KeychainOAuthCredentialStore: Sendable {
         let query = [
             kSecClass: kSecClassGenericPassword,
             kSecAttrService: service,
-            kSecAttrAccount: account,
-            kSecUseDataProtectionKeychain: true
+            kSecAttrAccount: account
         ] as CFDictionary
         let updateStatus = SecItemUpdate(query, [kSecValueData: data] as CFDictionary)
         if updateStatus == errSecSuccess { return }
@@ -87,13 +93,26 @@ struct KeychainOAuthCredentialStore: Sendable {
                 kSecClass: kSecClassGenericPassword,
                 kSecAttrService: service,
                 kSecAttrAccount: account,
-                kSecUseDataProtectionKeychain: true,
-                kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly,
+                kSecAttrAccessible: kSecAttrAccessibleAfterFirstUnlock,
+                kSecAttrSynchronizable: false,
                 kSecValueData: data
             ] as CFDictionary,
             nil
         )
         guard addStatus == errSecSuccess else {
+            throw UsageFailure.authentication
+        }
+    }
+
+    func delete() throws {
+        let status = SecItemDelete(
+            [
+                kSecClass: kSecClassGenericPassword,
+                kSecAttrService: service,
+                kSecAttrAccount: account
+            ] as CFDictionary
+        )
+        guard status == errSecSuccess || status == errSecItemNotFound else {
             throw UsageFailure.authentication
         }
     }
@@ -139,7 +158,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "api/accounts/deviceauth/usercode"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.1.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.1.2", forHTTPHeaderField: "User-Agent")
         request.httpBody = try JSONEncoder().encode(DeviceCodeRequest(clientID: Self.clientID))
 
         let response: DeviceCodeResponse = try await send(request)
@@ -164,7 +183,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
             var request = URLRequest(url: Self.issuer.appending(path: "api/accounts/deviceauth/token"))
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("codex_limitbar/0.1.1", forHTTPHeaderField: "User-Agent")
+            request.setValue("codex_limitbar/0.1.2", forHTTPHeaderField: "User-Agent")
             request.httpBody = try JSONEncoder().encode(
                 DeviceTokenRequest(
                     deviceAuthID: authorization.deviceAuthID,
@@ -196,7 +215,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "oauth/token"))
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.1.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.1.2", forHTTPHeaderField: "User-Agent")
         request.httpBody = formBody([
             "grant_type": "refresh_token",
             "refresh_token": credential.refreshToken,
@@ -213,7 +232,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "oauth/token"))
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.1.1", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.1.2", forHTTPHeaderField: "User-Agent")
         request.httpBody = formBody([
             "grant_type": "authorization_code",
             "code": code,

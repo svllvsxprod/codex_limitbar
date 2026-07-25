@@ -22,7 +22,7 @@ Authoritative references:
 2. Standard Codex auth at `~/.codex/auth.json`.
 3. Local OpenCode OpenAI OAuth at `~/.local/share/opencode/auth.json`.
 
-The app-owned session is created with the ChatGPT device authorization flow. The one-time code is copied to the pasteboard and the OpenAI device page opens in the default browser. Access and refresh tokens are stored as a generic password in Keychain with after-first-unlock, this-device-only accessibility.
+The app-owned session is created with the ChatGPT device authorization flow. The one-time code is copied to the pasteboard and the OpenAI device page opens in the default browser. Access and refresh tokens are stored as a non-synchronizing generic password in the user's macOS login Keychain with after-first-unlock accessibility.
 
 The app refreshes only its own Keychain credential. The OpenCode fallback is unsupported by OpenAI and may break when OpenCode changes its local auth format. Codex Limit Bar only reads external auth files and never modifies or refreshes another application's credentials.
 
