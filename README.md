@@ -1,4 +1,8 @@
 <p align="center">
+  <b>Русский</b> · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <img src="Sources/CodexLimitBar/Resources/AppIcon.svg" alt="Codex Limit Bar" width="150" />
 </p>
 
@@ -34,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.2.0" src="https://img.shields.io/badge/release-0.2.0-18A66A?style=for-the-badge">
+  <img alt="Release 0.2.1" src="https://img.shields.io/badge/release-0.2.1-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -49,14 +53,14 @@
 
 Codex Limit Bar живёт только в строке меню и показывает фактический оставшийся процент Codex, длительность окна и время следующего сброса. Приложение не создаёт обычное окно и не занимает место в Dock.
 
-Данные обновляются сразу после запуска и затем каждую минуту в фоне. Последний успешный результат сохраняется как stale snapshot при временной ошибке.
+Данные обновляются сразу после запуска и затем каждые три минуты в фоне. Последний успешный результат сохраняется как stale snapshot при временной ошибке.
 
 Проект является независимой утилитой и не аффилирован с OpenAI.
 
 ## Интерфейс
 
 <p align="center">
-  <img src="docs/readme/screenshots/codex-limit-bar.jpg" alt="Codex Limit Bar в строке меню macOS" width="560" />
+  <img src="docs/readme/screenshots/codex-limit-bar.png" alt="Codex Limit Bar в строке меню macOS" width="560" />
 </p>
 
 ## Возможности
@@ -66,7 +70,7 @@ Codex Limit Bar живёт только в строке меню и показы
 - Точное локальное время следующего сброса.
 - Состояния загрузки, stale data, истёкшей авторизации, rate limit, сети, VPN-gate и неизвестного формата.
 - Ручное обновление без параллельных дублирующихся запросов.
-- Фоновое обновление лимитов каждую минуту, даже когда панель закрыта.
+- Фоновое обновление лимитов каждые три минуты, даже когда панель закрыта.
 - Автозапуск через системный `SMAppService`.
 - Автономный ChatGPT device login с хранением собственной сессии в macOS Keychain.
 - Динамический процент остатка под OpenAI blossom в строке меню.
@@ -75,7 +79,7 @@ Codex Limit Bar живёт только в строке меню и показы
 
 ## Установка
 
-1. Скачайте `Codex-Limit-Bar-0.2.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Скачайте `Codex-Limit-Bar-0.2.1.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Откройте DMG и перенесите `Codex Limit Bar.app` в `Applications`.
 3. Запустите приложение. Для ad-hoc сборки macOS может потребовать первый запуск через контекстное меню **Открыть**.
 4. В панели приложения нажмите **Автономный вход**, вставьте скопированный код на открывшейся странице ChatGPT и завершите авторизацию.

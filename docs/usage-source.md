@@ -39,6 +39,6 @@ The last successful snapshot remains visible as stale data after a failed refres
 
 After macOS wakes from sleep, the app schedules refreshes after 3 and 15 seconds so network and VPN routes have time to recover. A `401` response is retried once: app-owned credentials are refreshed through OpenAI OAuth, while an external fallback is only re-read from its owning client's file.
 
-The app refreshes immediately after launch and then every 60 seconds in the background, including while the menu panel is closed.
+The app refreshes immediately after launch and then every 180 seconds in the background, including while the menu panel is closed.
 
 Before reading local auth or contacting OpenAI, each refresh concurrently probes YouTube, Speedtest, and WhatsApp with credential-free `HEAD` requests. If all three fail, the app reports that the VPN is unavailable and does not contact OpenAI. This is an explicit product heuristic, not cryptographic proof that a VPN tunnel is active.

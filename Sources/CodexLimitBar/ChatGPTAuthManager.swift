@@ -158,7 +158,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "api/accounts/deviceauth/usercode"))
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.2.1", forHTTPHeaderField: "User-Agent")
         request.httpBody = try JSONEncoder().encode(DeviceCodeRequest(clientID: Self.clientID))
 
         let response: DeviceCodeResponse = try await send(request)
@@ -183,7 +183,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
             var request = URLRequest(url: Self.issuer.appending(path: "api/accounts/deviceauth/token"))
             request.httpMethod = "POST"
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            request.setValue("codex_limitbar/0.2.0", forHTTPHeaderField: "User-Agent")
+            request.setValue("codex_limitbar/0.2.1", forHTTPHeaderField: "User-Agent")
             request.httpBody = try JSONEncoder().encode(
                 DeviceTokenRequest(
                     deviceAuthID: authorization.deviceAuthID,
@@ -215,7 +215,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "oauth/token"))
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.2.1", forHTTPHeaderField: "User-Agent")
         request.httpBody = formBody([
             "grant_type": "refresh_token",
             "refresh_token": credential.refreshToken,
@@ -232,7 +232,7 @@ actor ChatGPTAuthManager: ChatGPTAuthSessionProviding, ChatGPTAuthenticating {
         var request = URLRequest(url: Self.issuer.appending(path: "oauth/token"))
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        request.setValue("codex_limitbar/0.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.2.1", forHTTPHeaderField: "User-Agent")
         request.httpBody = formBody([
             "grant_type": "authorization_code",
             "code": code,

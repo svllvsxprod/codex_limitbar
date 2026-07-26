@@ -5,8 +5,8 @@ import XCTest
 
 final class UsageStoreTests: XCTestCase {
     @MainActor
-    func testDefaultRefreshIntervalIsOneMinute() {
-        XCTAssertEqual(UsageStore.defaultRefreshInterval, .seconds(60))
+    func testDefaultRefreshIntervalIsThreeMinutes() {
+        XCTAssertEqual(UsageStore.defaultRefreshInterval, .seconds(180))
     }
 
     @MainActor

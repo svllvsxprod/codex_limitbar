@@ -36,7 +36,7 @@ struct LiveCodexUsageProvider: CodexUsageProviding {
         request.setValue("Bearer \(auth.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(auth.accountID, forHTTPHeaderField: "ChatGPT-Account-Id")
         request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
-        request.setValue("codex_limitbar/0.2.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.2.1", forHTTPHeaderField: "User-Agent")
 
         let data: Data
         let response: URLResponse

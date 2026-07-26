@@ -25,7 +25,7 @@ enum ChatGPTSignInState: Equatable, Sendable {
 
 @MainActor
 final class UsageStore: NSObject, ObservableObject {
-    static let defaultRefreshInterval: Duration = .seconds(60)
+    static let defaultRefreshInterval: Duration = .seconds(180)
 
     @Published private(set) var state: UsageViewState = .loading(previous: nil)
     @Published private(set) var isRefreshing = false
