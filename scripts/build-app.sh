@@ -13,6 +13,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$ROOT/.build/release/CodexLimitBar" "$APP/Contents/MacOS/CodexLimitBar"
 cp "$ROOT/scripts/Info.plist" "$APP/Contents/Info.plist"
 cp "$ROOT/Sources/CodexLimitBar/Resources/limitbar-mark.svg" "$APP/Contents/Resources/"
+cp -R "$ROOT/.build/release/CodexLimitBar_CodexLimitBar.bundle/"*.lproj "$APP/Contents/Resources/"
 
 ICON_SOURCE="$ROOT/Sources/CodexLimitBar/Resources/AppIcon.svg"
 ICONSET="$ROOT/.build/AppIcon.iconset"

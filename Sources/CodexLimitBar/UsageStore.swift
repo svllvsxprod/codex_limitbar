@@ -25,6 +25,8 @@ enum ChatGPTSignInState: Equatable, Sendable {
 
 @MainActor
 final class UsageStore: NSObject, ObservableObject {
+    static let defaultRefreshInterval: Duration = .seconds(60)
+
     @Published private(set) var state: UsageViewState = .loading(previous: nil)
     @Published private(set) var isRefreshing = false
     @Published private(set) var signInState: ChatGPTSignInState = .idle
@@ -40,7 +42,7 @@ final class UsageStore: NSObject, ObservableObject {
     init(
         provider: any CodexUsageProviding,
         authenticator: (any ChatGPTAuthenticating)? = nil,
-        refreshInterval: Duration = .seconds(15),
+        refreshInterval: Duration = UsageStore.defaultRefreshInterval,
         wakeRefreshDelays: [Duration] = [.seconds(3), .seconds(12)]
     ) {
         self.provider = provider

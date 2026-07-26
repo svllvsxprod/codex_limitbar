@@ -49,19 +49,19 @@ enum UsageFailure: Error, Equatable, Sendable {
     var message: String {
         switch self {
         case .sourceUnavailable:
-            "Не найдена сессия ChatGPT"
+            L10n.text("failure_source_unavailable")
         case .authentication:
-            "Сессия ChatGPT истекла. Выполните автономный вход."
+            L10n.text("failure_authentication")
         case .forbidden:
-            "У аккаунта нет доступа к данным лимитов Codex"
+            L10n.text("failure_forbidden")
         case .rateLimited:
-            "OpenAI временно ограничил обновления"
+            L10n.text("failure_rate_limited")
         case .vpnUnavailable:
-            "VPN не обнаружен. OpenAI-запрос заблокирован."
+            L10n.text("failure_vpn_unavailable")
         case .network:
-            "Не удалось подключиться к OpenAI"
+            L10n.text("failure_network")
         case .malformedResponse:
-            "OpenAI вернул неизвестный формат лимитов"
+            L10n.text("failure_malformed_response")
         }
     }
 }

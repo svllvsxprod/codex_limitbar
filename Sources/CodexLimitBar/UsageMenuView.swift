@@ -36,8 +36,6 @@ struct UsageMenuView: View {
         .padding(16)
         .frame(width: 330)
         .fixedSize(horizontal: false, vertical: true)
-        .onAppear { store.start() }
-        .onDisappear { store.stop() }
     }
 
     private var header: some View {
@@ -62,7 +60,7 @@ struct UsageMenuView: View {
         HStack(spacing: 10) {
             ProgressView()
                 .controlSize(.small)
-            Text("Получаю лимиты...")
+            Text(L10n.text("loading_limits"))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, minHeight: 58, alignment: .leading)
@@ -73,7 +71,7 @@ struct UsageMenuView: View {
             ForEach(snapshot.limits) { limit in
                 VStack(alignment: .leading, spacing: 8) {
                     if snapshot.limits.count > 1 {
-                        Text(limit.name)
+                        Text(limitName(limit))
                             .font(.subheadline.weight(.semibold))
                     }
                     ForEach(limit.windows) { window in
@@ -86,18 +84,18 @@ struct UsageMenuView: View {
                 if isStale {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
-                    Text("Показаны последние данные")
+                    Text(L10n.text("stale_data"))
                 } else {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
-                    Text("Обновлено")
+                    Text(L10n.text("updated"))
                 }
                 Text(snapshot.fetchedAt, style: .relative)
                 Spacer()
                 if snapshot.source == .codexLimitBar {
                     Text(snapshot.source.rawValue)
                 } else {
-                    Button("Автономный вход") { store.signIn() }
+                    Button(L10n.text("independent_sign_in")) { store.signIn() }
                         .buttonStyle(.plain)
                         .disabled(store.signInState != .idle)
                 }
@@ -114,14 +112,22 @@ struct UsageMenuView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Spacer()
-                Text("\(window.remainingPercent)%")
+                Text(
+                    Double(window.remainingPercent) / 100,
+                    format: .percent.precision(.fractionLength(0))
+                )
                     .font(.title3.monospacedDigit().weight(.semibold))
                     .foregroundStyle(color(for: window.remainingPercent))
             }
             ProgressView(value: Double(window.remainingPercent), total: 100)
                 .tint(color(for: window.remainingPercent))
             if let reset = window.resetsAt {
-                Text("Сброс: \(reset.formatted(date: .abbreviated, time: .shortened))")
+                Text(
+                    L10n.format(
+                        "reset_format",
+                        reset.formatted(date: .abbreviated, time: .shortened)
+                    )
+                )
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
@@ -145,23 +151,23 @@ struct UsageMenuView: View {
     private var signInControls: some View {
         switch store.signInState {
         case .idle:
-            Button("Войти в ChatGPT") { store.signIn() }
+            Button(L10n.text("sign_in_chatgpt")) { store.signIn() }
                 .controlSize(.small)
         case .starting:
             HStack(spacing: 7) {
                 ProgressView().controlSize(.small)
-                Text("Создаю код входа...")
+                Text(L10n.text("creating_sign_in_code"))
             }
             .font(.caption)
         case let .waitingForUser(code):
             VStack(alignment: .leading, spacing: 5) {
-                Text("Код: \(code)")
+                Text(L10n.format("code_format", code))
                     .font(.system(.body, design: .monospaced).weight(.semibold))
                     .textSelection(.enabled)
-                Text("Код скопирован. Завершите вход в открывшемся браузере.")
+                Text(L10n.text("code_copied_instruction"))
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                Button("Отменить") { store.cancelSignIn() }
+                Button(L10n.text("cancel")) { store.cancelSignIn() }
                     .controlSize(.small)
             }
         case let .failed(failure):
@@ -169,7 +175,7 @@ struct UsageMenuView: View {
                 Text(failure.message)
                     .font(.caption2)
                     .foregroundStyle(.red)
-                Button("Повторить вход") { store.signIn() }
+                Button(L10n.text("retry_sign_in")) { store.signIn() }
                     .controlSize(.small)
             }
         }
@@ -180,13 +186,13 @@ struct UsageMenuView: View {
             Button {
                 store.refresh()
             } label: {
-                Label("Обновить", systemImage: "arrow.clockwise")
+                Label(L10n.text("refresh"), systemImage: "arrow.clockwise")
             }
             .disabled(store.isRefreshing)
 
             Spacer()
 
-            Button("Выход") {
+            Button(L10n.text("quit")) {
                 NSApplication.shared.terminate(nil)
             }
             .keyboardShortcut("q")
@@ -196,7 +202,7 @@ struct UsageMenuView: View {
 
     private var planLabel: String {
         guard let plan = store.state.snapshot?.planType else {
-            return "Лимиты использования"
+            return L10n.text("usage_limits")
         }
         return switch plan.lowercased() {
         case "plus": "ChatGPT Plus"
@@ -210,15 +216,22 @@ struct UsageMenuView: View {
     }
 
     private func windowLabel(_ minutes: Int?) -> String {
-        guard let minutes else { return "Лимит" }
+        guard let minutes else { return L10n.text("window_limit") }
         switch minutes {
         case 0 ... 360:
-            return "\(max(1, Int(ceil(Double(minutes) / 60)))) ч"
+            return L10n.format(
+                "window_hours_format",
+                max(1, Int(ceil(Double(minutes) / 60)))
+            )
         case 9_000 ... 11_000:
-            return "Неделя"
+            return L10n.text("window_week")
         default:
-            return "\(minutes) мин"
+            return L10n.format("window_minutes_format", minutes)
         }
+    }
+
+    private func limitName(_ limit: UsageLimit) -> String {
+        limit.id == "code-review" ? L10n.text("limit_code_review") : limit.name
     }
 
     private func color(for remainingPercent: Int) -> Color {

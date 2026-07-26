@@ -16,19 +16,21 @@ struct CodexLimitBarApp: App {
 
     init() {
         let authManager = ChatGPTAuthManager()
-        _store = StateObject(
-            wrappedValue: UsageStore(
-                provider: LiveCodexUsageProvider(authSession: authManager),
-                authenticator: authManager
-            )
+        let store = UsageStore(
+            provider: LiveCodexUsageProvider(authSession: authManager),
+            authenticator: authManager
         )
+        _store = StateObject(wrappedValue: store)
+        store.start()
     }
 
     var body: some Scene {
         MenuBarExtra {
             UsageMenuView(store: store)
         } label: {
-            LimitBarIconView(size: 17)
+            MenuBarUsageIconView(
+                remainingPercent: store.state.snapshot?.lowestRemainingPercent
+            )
         }
         .menuBarExtraStyle(.window)
     }

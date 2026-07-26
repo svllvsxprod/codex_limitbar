@@ -12,13 +12,16 @@ enum LimitBarIcon {
                 .appending(path: "CodexLimitBar_CodexLimitBar.bundle")
                 .appending(path: "limitbar-mark.svg")
         ]
-        let source = candidates.compactMap({ $0 }).lazy.compactMap(NSImage.init(contentsOf:)).first
-            ?? NSImage(systemSymbolName: "gauge.with.dots.needle.67percent", accessibilityDescription: "Codex Limit Bar")!
+        let mark = candidates.compactMap({ $0 }).lazy.compactMap(NSImage.init(contentsOf:)).first
+            ?? NSImage(
+                systemSymbolName: "gauge.with.dots.needle.67percent",
+                accessibilityDescription: L10n.text("app_name")
+            )!
         let iconSize = NSSize(width: 16, height: 16)
         let image = NSImage(size: iconSize, flipped: false) { rect in
-            source.draw(
+            mark.draw(
                 in: rect,
-                from: NSRect(origin: .zero, size: source.size),
+                from: NSRect(origin: .zero, size: mark.size),
                 operation: .sourceOver,
                 fraction: 1
             )
@@ -28,6 +31,19 @@ enum LimitBarIcon {
         image.isTemplate = true
         return image
     }()
+
+    static func percentageLabel(remainingPercent: Int?) -> String {
+        guard let remainingPercent else { return "--%" }
+        return "\(max(0, min(100, remainingPercent)))%"
+    }
+
+    static func accessibilityLabel(remainingPercent: Int?) -> String {
+        guard let remainingPercent else { return L10n.text("app_name") }
+        return L10n.format(
+            "menu_bar_accessibility_format",
+            max(0, min(100, remainingPercent))
+        )
+    }
 }
 
 struct LimitBarIconView: View {
@@ -38,6 +54,28 @@ struct LimitBarIconView: View {
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
-            .accessibilityLabel("Codex Limit Bar")
+            .accessibilityLabel(Text(L10n.text("app_name")))
+    }
+}
+
+struct MenuBarUsageIconView: View {
+    let remainingPercent: Int?
+
+    var body: some View {
+        VStack(spacing: -2) {
+            Image(nsImage: LimitBarIcon.image)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 10, height: 10)
+            Text(LimitBarIcon.percentageLabel(remainingPercent: remainingPercent))
+                .font(.system(size: 7, weight: .bold, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+        }
+        .frame(width: 22, height: 19)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(
+            Text(LimitBarIcon.accessibilityLabel(remainingPercent: remainingPercent))
+        )
     }
 }

@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "CodexLimitBar",
+    defaultLocalization: "en",
     platforms: [
         .macOS(.v14)
     ],

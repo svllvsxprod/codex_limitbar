@@ -5,6 +5,11 @@ import XCTest
 
 final class UsageStoreTests: XCTestCase {
     @MainActor
+    func testDefaultRefreshIntervalIsOneMinute() {
+        XCTAssertEqual(UsageStore.defaultRefreshInterval, .seconds(60))
+    }
+
+    @MainActor
     func testKeepsLastSnapshotWhenRefreshFails() async {
         let snapshot = UsageSnapshot(
             limits: [
