@@ -41,4 +41,6 @@ After macOS wakes from sleep, the app schedules refreshes after 3 and 15 seconds
 
 The app refreshes immediately after launch and then every 180 seconds in the background, including while the menu panel is closed.
 
+The daily-spent metric is computed locally from positive changes in the primary Codex window's `used_percent`. Window resets do not subtract from the accumulated total. OpenAI does not provide a daily aggregate, so usage that occurs while the app is not observing cannot be reconstructed.
+
 Before reading local auth or contacting OpenAI, each refresh concurrently probes YouTube, Speedtest, and WhatsApp with credential-free `HEAD` requests. If all three fail, the app reports that the VPN is unavailable and does not contact OpenAI. This is an explicit product heuristic, not cryptographic proof that a VPN tunnel is active.

@@ -46,6 +46,29 @@ final class UsageStoreTests: XCTestCase {
     }
 
     @MainActor
+    func testUpdatesDailySpentPercentageAfterSuccessfulRefresh() async {
+        let suiteName = "UsageStoreTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: suiteName)!
+        defaults.removePersistentDomain(forName: suiteName)
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let firstDate = Date(timeIntervalSince1970: 1_785_600_000)
+        let provider = SequenceProvider(outcomes: [
+            .success(snapshot(usedPercent: 20, fetchedAt: firstDate)),
+            .success(snapshot(usedPercent: 27, fetchedAt: firstDate.addingTimeInterval(60)))
+        ])
+        let store = UsageStore(
+            provider: provider,
+            dailyUsageTracker: DailyUsageTracker(defaults: defaults, calendar: calendar)
+        )
+
+        await store.refreshNow()
+        await store.refreshNow()
+
+        XCTAssertEqual(store.dailySpentPercent, 7)
+    }
+
+    @MainActor
     func testCoalescesConcurrentRefreshes() async {
         let provider = CountingProvider()
         let store = UsageStore(provider: provider)
@@ -93,6 +116,27 @@ final class UsageStoreTests: XCTestCase {
         XCTAssertEqual(fetchCount, 2)
         withExtendedLifetime(store) {}
     }
+}
+
+private func snapshot(usedPercent: Int, fetchedAt: Date) -> UsageSnapshot {
+    UsageSnapshot(
+        limits: [
+            UsageLimit(
+                id: "codex",
+                name: "Codex",
+                windows: [
+                    UsageWindow(
+                        usedPercent: usedPercent,
+                        windowDurationMinutes: 300,
+                        resetsAt: nil
+                    )
+                ]
+            )
+        ],
+        planType: "plus",
+        fetchedAt: fetchedAt,
+        source: .codexLimitBar
+    )
 }
 
 private actor SequenceProvider: CodexUsageProviding {

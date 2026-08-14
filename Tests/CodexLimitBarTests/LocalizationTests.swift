@@ -36,6 +36,7 @@ final class LocalizationTests: XCTestCase {
         let keys = [
             "app_name",
             "menu_bar_accessibility_format",
+            "today_spent_format",
             "usage_limits",
             "loading_limits",
             "stale_data",

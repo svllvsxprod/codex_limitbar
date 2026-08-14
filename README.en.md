@@ -38,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.2.1" src="https://img.shields.io/badge/release-0.2.1-18A66A?style=for-the-badge">
+  <img alt="Release 0.3.0" src="https://img.shields.io/badge/release-0.3.0-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -74,12 +74,13 @@ This project is an independent utility and is not affiliated with OpenAI.
 - Launch at login through the system `SMAppService` API.
 - Independent ChatGPT device login with an app-owned session stored in macOS Keychain.
 - Dynamic remaining percentage beneath the OpenAI blossom in the menu bar.
+- Accumulated primary Codex-window usage spent during the current day.
 - Automatic English or Russian UI localization based on the macOS language.
 - Native SwiftUI and AppKit implementation with no third-party runtime dependencies.
 
 ## Installation
 
-1. Download `Codex-Limit-Bar-0.2.1.dmg` from [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Download `Codex-Limit-Bar-0.3.0.dmg` from [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Open the DMG and drag `Codex Limit Bar.app` into `Applications`.
 3. Launch the app. Because the current build is ad-hoc signed, macOS may require the first launch through the **Open** context-menu command.
 4. Select **Independent sign-in** in the app panel, paste the copied code into the ChatGPT page that opens, and complete authorization.
@@ -162,3 +163,4 @@ The artifact and its SHA-256 checksum are written to `release/`.
 - The current public DMG is built for Apple Silicon.
 - The build is ad-hoc signed and not notarized by Apple; public production distribution requires Developer ID signing and notarization.
 - macOS may require manual approval of the login item.
+- Daily usage is derived from observed `used_percent` changes; the API cannot reconstruct usage while the app was not running.

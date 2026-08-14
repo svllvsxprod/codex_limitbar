@@ -30,11 +30,13 @@ final class UsageStore: NSObject, ObservableObject {
     @Published private(set) var state: UsageViewState = .loading(previous: nil)
     @Published private(set) var isRefreshing = false
     @Published private(set) var signInState: ChatGPTSignInState = .idle
+    @Published private(set) var dailySpentPercent: Int
 
     private let provider: any CodexUsageProviding
     private let authenticator: (any ChatGPTAuthenticating)?
     private let refreshInterval: Duration
     private let wakeRefreshDelays: [Duration]
+    private let dailyUsageTracker: DailyUsageTracker
     private var scheduleTask: Task<Void, Never>?
     private var wakeTask: Task<Void, Never>?
     private var signInTask: Task<Void, Never>?
@@ -43,12 +45,15 @@ final class UsageStore: NSObject, ObservableObject {
         provider: any CodexUsageProviding,
         authenticator: (any ChatGPTAuthenticating)? = nil,
         refreshInterval: Duration = UsageStore.defaultRefreshInterval,
-        wakeRefreshDelays: [Duration] = [.seconds(3), .seconds(12)]
+        wakeRefreshDelays: [Duration] = [.seconds(3), .seconds(12)],
+        dailyUsageTracker: DailyUsageTracker = DailyUsageTracker()
     ) {
         self.provider = provider
         self.authenticator = authenticator
         self.refreshInterval = refreshInterval
         self.wakeRefreshDelays = wakeRefreshDelays
+        self.dailyUsageTracker = dailyUsageTracker
+        dailySpentPercent = dailyUsageTracker.current()
         super.init()
         NSWorkspace.shared.notificationCenter.addObserver(
             self,
@@ -85,7 +90,9 @@ final class UsageStore: NSObject, ObservableObject {
         state = .loading(previous: previous)
 
         do {
-            state = .loaded(try await provider.fetchUsage())
+            let snapshot = try await provider.fetchUsage()
+            dailySpentPercent = dailyUsageTracker.record(snapshot, at: snapshot.fetchedAt)
+            state = .loaded(snapshot)
         } catch let failure as UsageFailure {
             state = .failed(previous: previous, failure: failure)
         } catch {

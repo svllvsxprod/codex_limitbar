@@ -38,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.2.1" src="https://img.shields.io/badge/release-0.2.1-18A66A?style=for-the-badge">
+  <img alt="Release 0.3.0" src="https://img.shields.io/badge/release-0.3.0-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -74,12 +74,13 @@ Codex Limit Bar живёт только в строке меню и показы
 - Автозапуск через системный `SMAppService`.
 - Автономный ChatGPT device login с хранением собственной сессии в macOS Keychain.
 - Динамический процент остатка под OpenAI blossom в строке меню.
+- Накопленная метрика расхода основного Codex-окна за текущий день.
 - Автоматическая локализация интерфейса на английский или русский язык системы.
 - Нативная реализация на SwiftUI и AppKit без сторонних runtime-зависимостей.
 
 ## Установка
 
-1. Скачайте `Codex-Limit-Bar-0.2.1.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Скачайте `Codex-Limit-Bar-0.3.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Откройте DMG и перенесите `Codex Limit Bar.app` в `Applications`.
 3. Запустите приложение. Для ad-hoc сборки macOS может потребовать первый запуск через контекстное меню **Открыть**.
 4. В панели приложения нажмите **Автономный вход**, вставьте скопированный код на открывшейся странице ChatGPT и завершите авторизацию.
@@ -162,3 +163,4 @@ open dist/CodexLimitBar.app
 - Текущий публичный DMG собран для Apple Silicon.
 - Сборка подписана ad-hoc и не нотарифицирована Apple; для публичной production-дистрибуции потребуется Developer ID и notarization.
 - macOS может потребовать ручное подтверждение login item.
+- Дневной расход вычисляется по наблюдаемым изменениям `used_percent`; время, когда приложение не работало, восстановить из API нельзя.

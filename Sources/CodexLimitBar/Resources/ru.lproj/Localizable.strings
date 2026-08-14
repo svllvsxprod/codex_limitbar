@@ -1,5 +1,6 @@
 "app_name" = "Codex Limit Bar";
 "menu_bar_accessibility_format" = "Codex Limit Bar, осталось %d%%";
+"today_spent_format" = "Сегодня потрачено: %d%%";
 "usage_limits" = "Лимиты использования";
 "loading_limits" = "Получаю лимиты...";
 "stale_data" = "Показаны последние данные";

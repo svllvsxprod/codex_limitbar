@@ -68,6 +68,13 @@ struct UsageMenuView: View {
 
     private func limits(snapshot: UsageSnapshot, isStale: Bool) -> some View {
         VStack(alignment: .leading, spacing: 14) {
+            Label(
+                L10n.format("today_spent_format", store.dailySpentPercent),
+                systemImage: "calendar"
+            )
+            .font(.caption.weight(.medium))
+            .foregroundStyle(.secondary)
+
             ForEach(snapshot.limits) { limit in
                 VStack(alignment: .leading, spacing: 8) {
                     if snapshot.limits.count > 1 {
