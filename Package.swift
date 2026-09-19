@@ -11,10 +11,17 @@ let package = Package(
     products: [
         .executable(name: "CodexLimitBar", targets: ["CodexLimitBar"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/sparkle-project/Sparkle", exact: "2.10.0")
+    ],
     targets: [
         .executableTarget(
             name: "CodexLimitBar",
-            resources: [.process("Resources")]
+            dependencies: [.product(name: "Sparkle", package: "Sparkle")],
+            resources: [.process("Resources")],
+            linkerSettings: [
+                .unsafeFlags(["-Xlinker", "-rpath", "-Xlinker", "@executable_path/../Frameworks"])
+            ]
         ),
         .testTarget(
             name: "CodexLimitBarTests",

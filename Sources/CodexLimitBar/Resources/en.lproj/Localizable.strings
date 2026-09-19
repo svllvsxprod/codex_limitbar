@@ -27,3 +27,24 @@
 "failure_vpn_unavailable" = "VPN not detected. The OpenAI request was blocked.";
 "failure_network" = "Could not connect to OpenAI";
 "failure_malformed_response" = "OpenAI returned an unknown usage format";
+
+"settings" = "Settings";
+"back_to_limits" = "Back to limits";
+"launch_at_login" = "Launch at login";
+"launch_at_login_description" = "Automatically open Codex Limit Bar when you log in to your Mac.";
+"launch_at_login_enabled" = "Codex Limit Bar will open automatically when you log in to your Mac.";
+"launch_at_login_approval" = "Allow Codex Limit Bar in System Settings to enable launch at login.";
+"launch_at_login_install" = "Move the app to Applications and launch it from there to enable launch at login.";
+"launch_at_login_unavailable" = "macOS could not find the login item. Try reopening the app from Applications.";
+"open_login_items" = "Open Login Items…";
+"launch_at_login_error_format" = "Could not change launch at login: %@";
+"launch_at_login_prompt_title" = "Enable launch at login?";
+"launch_at_login_prompt_description" = "Codex Limit Bar can open automatically when you log in to your Mac and show your limits in the menu bar. You can change this later using the gear button.";
+"launch_at_login_enable" = "Enable";
+"launch_at_login_later" = "Not now";
+"ok" = "OK";
+"update_available_format" = "Version %@ is available…";
+"app_version_format" = "Version %@";
+"automatic_update_checks" = "Check for updates automatically";
+"update_checks_description" = "Checks GitHub every six hours. Updates are installed only after you confirm.";
+"check_for_updates" = "Check for Updates…";

@@ -27,3 +27,24 @@
 "failure_vpn_unavailable" = "VPN не обнаружен. OpenAI-запрос заблокирован.";
 "failure_network" = "Не удалось подключиться к OpenAI";
 "failure_malformed_response" = "OpenAI вернул неизвестный формат лимитов";
+
+"settings" = "Настройки";
+"back_to_limits" = "Назад к лимитам";
+"launch_at_login" = "Запускать при входе в систему";
+"launch_at_login_description" = "Автоматически открывать Codex Limit Bar при входе в учётную запись Mac.";
+"launch_at_login_enabled" = "Codex Limit Bar будет открываться автоматически при входе в учётную запись Mac.";
+"launch_at_login_approval" = "Разрешите запуск Codex Limit Bar в системных настройках, чтобы включить автозапуск.";
+"launch_at_login_install" = "Перенесите приложение в «Программы» и запустите оттуда, чтобы включить автозапуск.";
+"launch_at_login_unavailable" = "macOS не нашла объект входа. Попробуйте открыть приложение заново из «Программ».";
+"open_login_items" = "Открыть объекты входа…";
+"launch_at_login_error_format" = "Не удалось изменить автозапуск: %@";
+"launch_at_login_prompt_title" = "Включить автозапуск?";
+"launch_at_login_prompt_description" = "Codex Limit Bar может открываться автоматически при входе в учётную запись Mac и показывать лимиты в строке меню. Позже это можно изменить через шестерёнку.";
+"launch_at_login_enable" = "Включить";
+"launch_at_login_later" = "Не сейчас";
+"ok" = "ОК";
+"update_available_format" = "Доступна версия %@…";
+"app_version_format" = "Версия %@";
+"automatic_update_checks" = "Проверять обновления";
+"update_checks_description" = "Проверка GitHub каждые шесть часов. Обновление устанавливается только после подтверждения.";
+"check_for_updates" = "Проверить обновления…";

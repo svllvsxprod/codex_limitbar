@@ -23,4 +23,5 @@ hdiutil create \
   "$DMG"
 
 (cd "$RELEASE_DIR" && shasum -a 256 "${DMG:t}" > "${DMG:t}.sha256")
+"$ROOT/scripts/build-appcast.sh"
 print "Built $DMG"

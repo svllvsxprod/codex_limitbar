@@ -38,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.3.0" src="https://img.shields.io/badge/release-0.3.0-18A66A?style=for-the-badge">
+  <img alt="Release 0.4.0" src="https://img.shields.io/badge/release-0.4.0-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -71,22 +71,32 @@ This project is an independent utility and is not affiliated with OpenAI.
 - Explicit loading, stale-data, expired-authentication, rate-limit, network, VPN-gate, and unknown-format states.
 - Manual refresh with coalescing to prevent duplicate concurrent requests.
 - Background usage refresh every three minutes, including while the panel is closed.
-- Launch at login through the system `SMAppService` API.
+- Optional launch at login through the system `SMAppService` API: gear button → “Launch at login”.
 - Independent ChatGPT device login with an app-owned session stored in macOS Keychain.
 - Dynamic remaining percentage beneath the OpenAI blossom in the menu bar.
 - Accumulated primary Codex-window usage spent during the current day.
 - Automatic English or Russian UI localization based on the macOS language.
-- Native SwiftUI and AppKit implementation with no third-party runtime dependencies.
+- Native SwiftUI and AppKit interface, with GitHub updates powered by Sparkle 2.
 
 ## Installation
 
-1. Download `Codex-Limit-Bar-0.3.0.dmg` from [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Download `Codex-Limit-Bar-0.4.0.dmg` from [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Open the DMG and drag `Codex Limit Bar.app` into `Applications`.
 3. Launch the app. Because the current build is ad-hoc signed, macOS may require the first launch through the **Open** context-menu command.
 4. Select **Independent sign-in** in the app panel, paste the copied code into the ChatGPT page that opens, and complete authorization.
-5. If needed, allow launch at login under **System Settings → General → Login Items**.
+5. To enable launch at login, click the gear in the top-right corner of the panel and turn on **Launch at login**. If macOS needs approval, click **Open Login Items…** and allow the app in System Settings. Launch the app from `Applications` first.
+
+On the first launch from `Applications`, the app offers to enable launch at login. Choose “Not now” to leave it off; the prompt is shown only once.
+
+Launch at login is enabled only by user choice. Existing registration is preserved when updating, and changes made in macOS System Settings are respected.
 
 Before independent sign-in, the app may temporarily use local Codex CLI or OpenCode authentication as a read-only fallback. After sign-in, Codex Limit Bar stores and refreshes its own session independently of a running OpenCode process.
+
+## GitHub Updates
+
+Starting with 0.4.0, the app checks for updates every six hours. New versions are offered in the menu; settings include an automatic-check switch and **Check for Updates…**. After confirmation, Sparkle downloads the update, verifies its signature, replaces the app, and relaunches it.
+
+The feed and update archives are signed with Ed25519. GitHub checks do not send ChatGPT tokens, and Sparkle system profiling is disabled. Users upgrading from 0.3.0 or earlier need to install the DMG manually once.
 
 ## VPN Check
 
@@ -101,7 +111,7 @@ This is a product-level connectivity heuristic, not a check for a specific VPN i
 ## Architecture
 
 ```text
-MenuBarExtra window
+NSStatusItem + NSPopover
   -> UsageStore
   -> PublicServiceConnectivityGate
   -> ChatGPTAuthManager / Keychain
@@ -113,7 +123,7 @@ MenuBarExtra window
 - The UI depends on `CodexUsageProviding`, not on the transport response.
 - Parsing, OAuth retry, local authentication, wake refresh, VPN gate, and refresh state are tested independently.
 - Refresh requests are coalesced and cannot create overlapping polling loops.
-- The release pipeline builds the `.app`, `.icns`, DMG, and SHA-256 checksum.
+- The release pipeline builds the `.app`, `.icns`, DMG, SHA-256 checksum, and signed `appcast.xml`.
 
 ## Security
 
@@ -153,7 +163,7 @@ Build the DMG:
 ./scripts/build-dmg.sh
 ```
 
-The artifact and its SHA-256 checksum are written to `release/`.
+The DMG, SHA-256 checksum, and signed `appcast.xml` are written to `release/`. Signing requires the existing Sparkle key in Keychain; see [`release/README.md`](release/README.md).
 
 ## Limitations
 

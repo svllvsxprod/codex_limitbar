@@ -57,25 +57,3 @@ struct LimitBarIconView: View {
             .accessibilityLabel(Text(L10n.text("app_name")))
     }
 }
-
-struct MenuBarUsageIconView: View {
-    let remainingPercent: Int?
-
-    var body: some View {
-        VStack(spacing: -2) {
-            Image(nsImage: LimitBarIcon.image)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 10, height: 10)
-            Text(LimitBarIcon.percentageLabel(remainingPercent: remainingPercent))
-                .font(.system(size: 7, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .lineLimit(1)
-        }
-        .frame(width: 22, height: 19)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(
-            Text(LimitBarIcon.accessibilityLabel(remainingPercent: remainingPercent))
-        )
-    }
-}

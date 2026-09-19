@@ -3,39 +3,78 @@ import SwiftUI
 
 struct UsageMenuView: View {
     @ObservedObject var store: UsageStore
+    @ObservedObject var launchAtLogin: LaunchAtLogin
+    @ObservedObject var updater: AppUpdater
+    @State private var showingSettings = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
 
-            switch store.state {
-            case let .loading(previous):
-                if let previous {
-                    limits(snapshot: previous, isStale: true)
-                } else {
-                    loading
+            if let version = updater.availableVersion {
+                Button {
+                    updater.checkForUpdates()
+                } label: {
+                    Label(
+                        L10n.format("update_available_format", version),
+                        systemImage: "arrow.down.circle.fill"
+                    )
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
-            case let .loaded(snapshot):
-                limits(snapshot: snapshot, isStale: false)
-            case let .failed(previous, failure):
-                if let previous {
-                    limits(snapshot: previous, isStale: true)
-                    errorMessage(failure)
-                } else {
-                    errorMessage(failure)
-                }
+                .foregroundStyle(Color.accentColor)
             }
 
-            if store.state.snapshot != nil, store.signInState != .idle {
-                signInControls
+            if showingSettings {
+                settings
+            } else {
+                usageContent
             }
 
             Divider()
             controls
         }
-        .padding(16)
-        .frame(width: 330)
+        .padding(18)
+        .frame(width: 360)
         .fixedSize(horizontal: false, vertical: true)
+        .buttonStyle(PanelButtonStyle())
+        .task(id: showingSettings) {
+            guard showingSettings else { return }
+            // Menu bar panels may stay inactive when System Settings changes.
+            // Read the system state while this page is visible; never re-register here.
+            while !Task.isCancelled {
+                launchAtLogin.refresh()
+                do {
+                    try await Task.sleep(for: .seconds(2))
+                } catch {
+                    return
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var usageContent: some View {
+        switch store.state {
+        case let .loading(previous):
+            if let previous {
+                limits(snapshot: previous, isStale: true)
+            } else {
+                loading
+            }
+        case let .loaded(snapshot):
+            limits(snapshot: snapshot, isStale: false)
+        case let .failed(previous, failure):
+            if let previous {
+                limits(snapshot: previous, isStale: true)
+                errorMessage(failure)
+            } else {
+                errorMessage(failure)
+            }
+        }
+
+        if store.state.snapshot != nil, store.signInState != .idle {
+            signInControls
+        }
     }
 
     private var header: some View {
@@ -53,6 +92,105 @@ struct UsageMenuView: View {
                 ProgressView()
                     .controlSize(.small)
             }
+            Button {
+                launchAtLogin.refresh()
+                showingSettings.toggle()
+            } label: {
+                Image(systemName: showingSettings ? "gearshape.fill" : "gearshape")
+                    .font(.system(size: 14))
+                    .foregroundStyle(showingSettings ? Color.accentColor : Color.secondary)
+                    .frame(width: 32, height: 32)
+                    .background(
+                        Color.primary.opacity(showingSettings ? 0.09 : 0.04),
+                        in: RoundedRectangle(cornerRadius: 9)
+                    )
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .help(L10n.text(showingSettings ? "back_to_limits" : "settings"))
+            .accessibilityLabel(L10n.text(showingSettings ? "back_to_limits" : "settings"))
+        }
+    }
+
+    private var settings: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(L10n.text("settings"))
+                .font(.headline)
+
+            HStack {
+                Text(L10n.text("launch_at_login"))
+                Spacer()
+                Toggle(
+                    L10n.text("launch_at_login"),
+                    isOn: Binding(
+                        get: { launchAtLogin.isEnabled },
+                        set: { launchAtLogin.setEnabled($0) }
+                    )
+                )
+                .labelsHidden()
+            }
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .frame(minHeight: 32)
+            .disabled(!launchAtLogin.canChange)
+
+            Text(launchAtLogin.statusMessage)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if launchAtLogin.requiresApproval {
+                Button(L10n.text("open_login_items")) {
+                    launchAtLogin.openSystemSettings()
+                }
+                .controlSize(.small)
+            }
+
+            if let message = launchAtLogin.errorMessage {
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Divider()
+
+            Text(L10n.format("app_version_format", updater.version))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            HStack {
+                Text(L10n.text("automatic_update_checks"))
+                Spacer()
+                Toggle(
+                    L10n.text("automatic_update_checks"),
+                    isOn: Binding(
+                        get: { updater.automaticallyChecksForUpdates },
+                        set: { updater.setAutomaticChecks($0) }
+                    )
+                )
+                .labelsHidden()
+            }
+            .toggleStyle(.switch)
+            .controlSize(.small)
+            .frame(minHeight: 32)
+            .disabled(!updater.isAvailable)
+
+            Text(L10n.text("update_checks_description"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(L10n.text("check_for_updates")) {
+                updater.checkForUpdates()
+            }
+            .disabled(!updater.canCheckForUpdates)
+            .controlSize(.small)
+
+            Button(L10n.text("back_to_limits")) {
+                showingSettings = false
+            }
+            .controlSize(.small)
         }
     }
 

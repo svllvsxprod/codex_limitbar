@@ -38,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.3.0" src="https://img.shields.io/badge/release-0.3.0-18A66A?style=for-the-badge">
+  <img alt="Release 0.4.0" src="https://img.shields.io/badge/release-0.4.0-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -71,22 +71,32 @@ Codex Limit Bar живёт только в строке меню и показы
 - Состояния загрузки, stale data, истёкшей авторизации, rate limit, сети, VPN-gate и неизвестного формата.
 - Ручное обновление без параллельных дублирующихся запросов.
 - Фоновое обновление лимитов каждые три минуты, даже когда панель закрыта.
-- Автозапуск через системный `SMAppService`.
+- Управляемый автозапуск через системный `SMAppService`: шестерёнка → «Запускать при входе в систему».
 - Автономный ChatGPT device login с хранением собственной сессии в macOS Keychain.
 - Динамический процент остатка под OpenAI blossom в строке меню.
 - Накопленная метрика расхода основного Codex-окна за текущий день.
 - Автоматическая локализация интерфейса на английский или русский язык системы.
-- Нативная реализация на SwiftUI и AppKit без сторонних runtime-зависимостей.
+- Нативный интерфейс на SwiftUI и AppKit; обновления GitHub через Sparkle 2.
 
 ## Установка
 
-1. Скачайте `Codex-Limit-Bar-0.3.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Скачайте `Codex-Limit-Bar-0.4.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Откройте DMG и перенесите `Codex Limit Bar.app` в `Applications`.
 3. Запустите приложение. Для ad-hoc сборки macOS может потребовать первый запуск через контекстное меню **Открыть**.
 4. В панели приложения нажмите **Автономный вход**, вставьте скопированный код на открывшейся странице ChatGPT и завершите авторизацию.
-5. При необходимости разрешите автозапуск в **Настройки системы → Основные → Объекты входа**.
+5. Для автозапуска откройте шестерёнку в правом верхнем углу панели и включите **Запускать при входе в систему**. Если macOS требует разрешения, нажмите **Открыть объекты входа…** и разрешите запуск в системных настройках. Приложение должно быть запущено из `Applications`.
+
+При первом запуске из `Applications` приложение сразу предлагает включить автозапуск. Кнопка «Не сейчас» откладывает настройку; повторно предложение не появляется.
+
+Автозапуск включается только по выбору пользователя. Уже зарегистрированный автозапуск сохраняется при обновлении; отключение в настройках macOS учитывается приложением.
 
 До автономного входа приложение может временно использовать локальную авторизацию Codex CLI или OpenCode как read-only fallback. После входа Codex Limit Bar хранит и обновляет собственную сессию независимо от запущенного OpenCode.
+
+## Обновления GitHub
+
+Начиная с 0.4.0 приложение проверяет обновления каждые шесть часов. В меню появляется предложение новой версии; в настройках доступны переключатель проверки и кнопка **Проверить обновления…**. Установка выполняется после подтверждения: Sparkle скачивает обновление, проверяет подпись, заменяет приложение и перезапускает его.
+
+Лента обновлений и архивы подписаны Ed25519. Проверка GitHub не отправляет токены ChatGPT, а сбор системной статистики Sparkle отключён. Для первого перехода с 0.3.0 или более ранней версии установите DMG вручную.
 
 ## Проверка VPN
 
@@ -101,7 +111,7 @@ Codex Limit Bar живёт только в строке меню и показы
 ## Архитектура
 
 ```text
-MenuBarExtra window
+NSStatusItem + NSPopover
   -> UsageStore
   -> PublicServiceConnectivityGate
   -> ChatGPTAuthManager / Keychain
@@ -113,7 +123,7 @@ MenuBarExtra window
 - UI зависит от `CodexUsageProviding`, а не от transport response.
 - Парсер, OAuth retry, локальная авторизация, wake refresh, VPN-gate и refresh state тестируются отдельно.
 - Refresh-запросы coalesce и не создают параллельный polling loop.
-- Release pipeline собирает `.app`, `.icns`, DMG и SHA-256 checksum.
+- Release pipeline собирает `.app`, `.icns`, DMG, SHA-256 checksum и подписанный `appcast.xml`.
 
 ## Безопасность
 
@@ -153,7 +163,7 @@ open dist/CodexLimitBar.app
 ./scripts/build-dmg.sh
 ```
 
-Артефакт и SHA-256 checksum будут записаны в `release/`.
+DMG, SHA-256 checksum и подписанный `appcast.xml` будут записаны в `release/`. Для подписи нужен существующий ключ Sparkle в Keychain; инструкция публикации — [`release/README.md`](release/README.md).
 
 ## Ограничения
 

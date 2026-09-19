@@ -4,5 +4,6 @@
 dist/
 release/*.dmg
 release/*.sha256
+release/appcast.xml
 DerivedData/
 *.xcresult
