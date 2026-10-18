@@ -48,3 +48,7 @@
 "automatic_update_checks" = "Check for updates automatically";
 "update_checks_description" = "Checks GitHub every six hours. Updates are installed only after you confirm.";
 "check_for_updates" = "Check for Updates…";
+
+"available_resets" = "Available resets";
+"available_resets_description" = "Number of available manual resets for Codex usage limits.";
+"available_resets_unavailable" = "The server did not provide the number of available resets.";

@@ -36,7 +36,7 @@ struct LiveCodexUsageProvider: CodexUsageProviding {
         request.setValue("Bearer \(auth.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue(auth.accountID, forHTTPHeaderField: "ChatGPT-Account-Id")
         request.setValue("no-store", forHTTPHeaderField: "Cache-Control")
-        request.setValue("codex_limitbar/0.4.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("codex_limitbar/0.4.1", forHTTPHeaderField: "User-Agent")
 
         let data: Data
         let response: URLResponse
@@ -134,7 +134,8 @@ enum BackendUsageParser {
             limits: limits,
             planType: response.planType,
             fetchedAt: fetchedAt,
-            source: source
+            source: source,
+            availableResetCount: response.resetCredits?.availableCount
         )
     }
 
@@ -166,12 +167,14 @@ enum BackendUsageParser {
 
 private struct BackendUsageResponse: Decodable {
     let planType: String?
+    let resetCredits: BackendResetCredits?
     let rateLimit: BackendRateLimitDetails?
     let codeReviewRateLimit: BackendRateLimitDetails?
     let additionalRateLimits: [BackendAdditionalRateLimit]
 
     enum CodingKeys: String, CodingKey {
         case planType = "plan_type"
+        case resetCredits = "rate_limit_reset_credits"
         case rateLimit = "rate_limit"
         case codeReviewRateLimit = "code_review_rate_limit"
         case additionalRateLimits = "additional_rate_limits"
@@ -180,6 +183,8 @@ private struct BackendUsageResponse: Decodable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         planType = try container.decodeIfPresent(String.self, forKey: .planType)
+        // Optional metadata must not prevent displaying otherwise valid usage limits.
+        resetCredits = try? container.decodeIfPresent(BackendResetCredits.self, forKey: .resetCredits)
         rateLimit = try container.decodeIfPresent(BackendRateLimitDetails.self, forKey: .rateLimit)
         codeReviewRateLimit = try container.decodeIfPresent(
             BackendRateLimitDetails.self,
@@ -223,5 +228,19 @@ private struct BackendRateLimitWindow: Decodable {
         case usedPercent = "used_percent"
         case limitWindowSeconds = "limit_window_seconds"
         case resetAt = "reset_at"
+    }
+}
+
+private struct BackendResetCredits: Decodable {
+    let availableCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case availableCount = "available_count"
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let count = try? container.decodeIfPresent(Int.self, forKey: .availableCount)
+        availableCount = count.flatMap { $0 >= 0 ? $0 : nil }
     }
 }

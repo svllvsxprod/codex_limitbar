@@ -52,6 +52,43 @@ final class BackendUsageParserTests: XCTestCase {
         XCTAssertEqual(snapshot.limits[1].windows.first?.remainingPercent, 95)
     }
 
+    func testParsesAvailableResetCount() throws {
+        for count in [0, 1, 12] {
+            let snapshot = try parseResetMetadata(
+                #""rate_limit_reset_credits":{"available_count":\#(count),"applicable_available_count":0}"#
+            )
+            XCTAssertEqual(snapshot.availableResetCount, count)
+        }
+    }
+
+    func testUnavailableResetCountDoesNotBecomeZeroOrBreakUsage() throws {
+        let cases = [
+            "",
+            #""rate_limit_reset_credits":null"#,
+            #""rate_limit_reset_credits":{}"#,
+            #""rate_limit_reset_credits":{"available_count":null}"#,
+            #""rate_limit_reset_credits":{"applicable_available_count":3}"#,
+            #""rate_limit_reset_credits":{"available_count":-1}"#,
+            #""rate_limit_reset_credits":{"available_count":"3"}"#,
+            #""rate_limit_reset_credits":{"available_count":1.5}"#,
+            #""rate_limit_reset_credits":{"available_count":true}"#,
+            #""rate_limit_reset_credits":[]"#
+        ]
+        for metadata in cases {
+            let snapshot = try parseResetMetadata(metadata)
+            XCTAssertNil(snapshot.availableResetCount, metadata)
+            XCTAssertEqual(snapshot.limits[0].windows[0].remainingPercent, 64, metadata)
+        }
+    }
+
+    private func parseResetMetadata(_ metadata: String) throws -> UsageSnapshot {
+        let suffix = metadata.isEmpty ? "" : "," + metadata
+        let data = Data(
+            #"{"rate_limit":{"primary_window":{"used_percent":36}}\#(suffix)}"#.utf8
+        )
+        return try BackendUsageParser.parse(data: data, source: .codexLimitBar, fetchedAt: Date())
+    }
+
     func testRejectsResponseWithoutUsageWindows() {
         let data = Data(#"{"plan_type":"plus","rate_limit":null}"#.utf8)
 

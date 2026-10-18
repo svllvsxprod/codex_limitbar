@@ -38,7 +38,7 @@
   <img alt="Swift 6" src="https://img.shields.io/badge/Swift-6-F05138?style=for-the-badge&amp;logo=swift&amp;logoColor=white">
   <img alt="macOS 14+" src="https://img.shields.io/badge/macOS-14%2B-000000?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple_Silicon-ready-555555?style=for-the-badge&amp;logo=apple&amp;logoColor=white">
-  <img alt="Release 0.4.0" src="https://img.shields.io/badge/release-0.4.0-18A66A?style=for-the-badge">
+  <img alt="Release 0.4.1" src="https://img.shields.io/badge/release-0.4.1-18A66A?style=for-the-badge">
 </p>
 
 <p align="center">
@@ -68,6 +68,7 @@ Codex Limit Bar живёт только в строке меню и показы
 - Фактический остаток основного недельного или короткого окна Codex.
 - Дополнительные лимиты моделей, если они присутствуют в ответе аккаунта.
 - Точное локальное время следующего сброса.
+- Количество доступных ручных сбросов; «—», если сервер не предоставил данные.
 - Состояния загрузки, stale data, истёкшей авторизации, rate limit, сети, VPN-gate и неизвестного формата.
 - Ручное обновление без параллельных дублирующихся запросов.
 - Фоновое обновление лимитов каждые три минуты, даже когда панель закрыта.
@@ -80,7 +81,7 @@ Codex Limit Bar живёт только в строке меню и показы
 
 ## Установка
 
-1. Скачайте `Codex-Limit-Bar-0.4.0.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
+1. Скачайте `Codex-Limit-Bar-0.4.1.dmg` из [GitHub Releases](https://github.com/svllvsxprod/codex_limitbar/releases/latest).
 2. Откройте DMG и перенесите `Codex Limit Bar.app` в `Applications`.
 3. Запустите приложение. Для ad-hoc сборки macOS может потребовать первый запуск через контекстное меню **Открыть**.
 4. В панели приложения нажмите **Автономный вход**, вставьте скопированный код на открывшейся странице ChatGPT и завершите авторизацию.

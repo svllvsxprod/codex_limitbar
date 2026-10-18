@@ -48,3 +48,7 @@
 "automatic_update_checks" = "Проверять обновления";
 "update_checks_description" = "Проверка GitHub каждые шесть часов. Обновление устанавливается только после подтверждения.";
 "check_for_updates" = "Проверить обновления…";
+
+"available_resets" = "Доступно сбросов";
+"available_resets_description" = "Количество доступных ручных сбросов лимитов Codex.";
+"available_resets_unavailable" = "Сервер не предоставил количество доступных сбросов.";

@@ -225,6 +225,19 @@ struct UsageMenuView: View {
                 }
             }
 
+            HStack {
+                Label(L10n.text("available_resets"), systemImage: "arrow.counterclockwise")
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(snapshot.availableResetCount.map { $0.formatted() } ?? "—")
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+            }
+            .font(.caption)
+            .accessibilityElement(children: .combine)
+            .help(L10n.text(snapshot.availableResetCount == nil
+                ? "available_resets_unavailable" : "available_resets_description"))
+
             HStack(spacing: 5) {
                 if isStale {
                     Image(systemName: "exclamationmark.triangle.fill")

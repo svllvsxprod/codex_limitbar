@@ -31,6 +31,21 @@ struct UsageSnapshot: Equatable, Sendable {
     let planType: String?
     let fetchedAt: Date
     let source: UsageSource
+    let availableResetCount: Int?
+
+    init(
+        limits: [UsageLimit],
+        planType: String?,
+        fetchedAt: Date,
+        source: UsageSource,
+        availableResetCount: Int? = nil
+    ) {
+        self.limits = limits
+        self.planType = planType
+        self.fetchedAt = fetchedAt
+        self.source = source
+        self.availableResetCount = availableResetCount
+    }
 
     var lowestRemainingPercent: Int? {
         limits.flatMap(\.windows).map(\.remainingPercent).min()
